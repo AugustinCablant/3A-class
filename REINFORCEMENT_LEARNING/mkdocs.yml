@@ -1,0 +1,35 @@
+site_name: Reinforcement learning class @ MVA Master of Science
+site_description: Introduction to reinforcement learning class
+site_url: https://erachelson.github.io/RLclass_MVA/
+site_dir: site
+strict: false
+use_directory_urls: false
+
+theme:
+  name: 'cinder'
+  logo: 'https://raw.githubusercontent.com/erachelson/RLclass_MVA/main/docs/img/favicon/favicon.ico'
+  favicon: 'https://raw.githubusercontent.com/erachelson/RLclass_MVA/main/docs/img/favicon/favicon.ico'
+  features:
+    - toc.autohide
+    - navigation.sections
+
+repo_name: erachelson/RLclass_MVA
+repo_url: https://github.com/erachelson/RLclass_MVA
+
+nav:
+- RL class home: index.md
+
+markdown_extensions:
+- markdown.extensions.codehilite:
+    guess_lang: false
+- toc:
+    permalink: 🔗
+- admonition
+- codehilite
+- extra
+- attr_list
+- pymdownx.details
+- pymdownx.superfences
+
+plugins:
+- search
