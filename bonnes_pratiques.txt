@@ -1,0 +1,20 @@
+- Décomposer les fonctions : Une fonction ne doit accomplir qu’une seule tâche bien définie.
+- Docstrings : Utiliser des docstrings pour décrire les fonctions, leur rôle, les paramètres attendus et les valeurs de retour.
+def function():
+    """
+    Description.
+    
+    Args:
+        list: List of numbers.
+        
+    Returns:
+        float: Mean of the numbers.
+    """
+    fonction 
+    return 
+
+- Commenter les sections de code complexes pour expliquer leur fonctionnement.
+- 4 espaces pour l'indentation 
+- longueur des lignes à 79 caractères pour le code et 72 caractères pour les commentaires et docstrings 
+- Ajouter un espace après les virgules, les deux-points et avant et après les opérateurs
+- blocs try-except pour gérer les exceptions en Python
