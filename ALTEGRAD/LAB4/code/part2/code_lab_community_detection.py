@@ -60,6 +60,11 @@ def spectral_clustering(G, k):
     ##################
     return clustering
 
+
+############## Task 4
+
+##################
+#k = 50  # very long !
 k = 10
 clustering_50 = spectral_clustering(G, k)
 sample_nodes = np.random.choice(list(G.nodes()), size = 500, replace=False)
@@ -80,11 +85,6 @@ plt.legend(handles=patches, title="Clusters")
 
 plt.title("Sample of Spectral Clustering")
 plt.show()
-
-############## Task 4
-
-##################
-# your code here #
 ##################
 
 
@@ -93,16 +93,32 @@ plt.show()
 ############## Task 5
 # Compute modularity value from graph G based on clustering
 def modularity(G, clustering):
+    """ Compute modularity value from graph G based on clustering 
     
+    Parameters
+    ----------
+    
+    G = (V, E): a networkx graph
+    clustering: Dictionary keyed by node to the cluster to which the node belongs
+    
+    Returns
+    -------
+    
+    modularity: The modularity value
+    
+    """
     ##################
-    # your code here #
+    m = G.number_of_edges()
+    n_c = len(set(clustering.values()))   # Number of clusters or communities 
+    modularity = 0
+    for index_cluster in range(n_c):
+        nodes_in_cluster = [node for node, cluster in clustering.items() if cluster == index_cluster]    # Nodes in the cluster
+        subgraph = G.subgraph(nodes_in_cluster)    # Subgraph induced by the nodes in the cluster
+        l_c = subgraph.number_of_edges()   # Number of edges in the subgraph
+        d_c = sum([G.degree(node) for node in nodes_in_cluster])   # Sum of the degrees of the nodes in the cluster
+        modularity += l_c / m - (d_c / (2 * m)) ** 2
     ##################
-    
-    
-    
-    
     return modularity
-
 
 
 ############## Task 6
