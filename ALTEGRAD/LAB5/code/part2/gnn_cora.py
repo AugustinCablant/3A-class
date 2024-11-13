@@ -104,14 +104,15 @@ embeddings_test = test()
 # Transforms torch tensor to numpy matrix
 
 ##################
-# your code here #
+embeddings_test = embeddings_test.detach().cpu().numpy()
 ##################
 
 
 # Projects the emerging representations to two dimensions using t-SNE
 
 ##################
-# your code here #
+tsne = TSNE(n_components=2)
+embeddings_test_2d = tsne.fit_transform(embeddings_test)
 ##################
 
 
@@ -133,4 +134,5 @@ for i in range(unique_labels.size):
 ax.legend(scatterpoints=1)
 fig.suptitle('T-SNE Visualization of the nodes of the test set',fontsize=12)
 fig.set_size_inches(15,9)
+plt.savefig('T-SNE.pdf')
 plt.show()

@@ -14,14 +14,14 @@ from deepwalk import deepwalk
 
 
 # Loads the karate network
-G = nx.read_weighted_edgelist('../data/karate.edgelist', delimiter=' ', nodetype=int, create_using=nx.Graph())
+G = nx.read_weighted_edgelist('ALTEGRAD/LAB5/code/data/karate.edgelist', delimiter=' ', nodetype=int, create_using=nx.Graph())
 print("Number of nodes:", G.number_of_nodes())
 print("Number of edges:", G.number_of_edges())
 
 n = G.number_of_nodes()
 
 # Loads the class labels
-class_labels = np.loadtxt('../data/karate_labels.txt', delimiter=',', dtype=np.int32)
+class_labels = np.loadtxt('ALTEGRAD/LAB5/code/data/karate_labels.txt', delimiter=',', dtype=np.int32)
 idx_to_class_label = dict()
 for i in range(class_labels.shape[0]):
     idx_to_class_label[class_labels[i,0]] = class_labels[i,1]
@@ -34,10 +34,9 @@ y = np.array(y)
 
 
 ############## Task 5
-# Visualizes the karate network
 
 ##################
-# your code here #
+nx.draw_networkx(G, node_color = y)
 ##################
 
 
@@ -46,7 +45,7 @@ y = np.array(y)
 n_dim = 128
 n_walks = 10
 walk_length = 20
-model = # your code here
+model = deepwalk(G, n_walks, walk_length, n_dim)    # your code here
 
 embeddings = np.zeros((n, n_dim))
 for i, node in enumerate(G.nodes()):
@@ -68,7 +67,10 @@ y_test = y[idx_test]
 
 
 ##################
-# your code here #
+LRC = LogisticRegression().fit(X_train, y_train)
+y_pred = LRC.predict(X_test)
+acc = accuracy_score(y_test, y_pred)
+print("The accuracy of the DeepWalk technique is: ", acc)
 ##################
 
 
@@ -76,5 +78,20 @@ y_test = y[idx_test]
 # Generates spectral embeddings
 
 ##################
-# your code here #
+A = nx.adjacency_matrix(G)
+inverse_degree_sequence = [1 / G.degree(node) for node in G.nodes()]
+D = diags(inverse_degree_sequence)
+laplacian = eye(G.number_of_nodes()) - D @ A
+
+_, eigenvectors = eigs(laplacian, k=2, which='SR')
+eigenvectors = np.real(np.array(eigenvectors))
+
+# Train a Logistic Regression classifier
+X_train_rw = eigenvectors[idx_train,:]
+X_test_rw = eigenvectors[idx_test,:]
+
+lrc_rw = LogisticRegression().fit(X_train_rw, y_train)
+y_rw_pred = lrc_rw.predict(X_test_rw)
+acc_rw = accuracy_score(y_test, y_rw_pred)
+print("The accuracy of the Spectral decomposition technique is: ", acc_rw)
 ##################

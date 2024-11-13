@@ -21,8 +21,19 @@ class GNN(nn.Module):
         ############## Tasks 10 and 13
         
         ##################
-        # your code here #
+        # Layer 1
+        z_0 = self.fc1(x_in)
+        z_0 = self.relu(torch.mm(adj, z_0))
+        z_0 = self.dropout(z_0)
+
+        # Layer 2
+        z_1 = self.fc2(z_0)
+        z_1 = self.relu(torch.mm(adj, z_1))
+        z_1 = self.dropout(z_1)
+
+        # Layer 3
+        x = self.fc3(z_1)
+
         ##################
 
-
-        return F.log_softmax(x, dim=1)
+        return F.log_softmax(x, dim=1), z_1
