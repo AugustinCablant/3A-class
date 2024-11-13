@@ -23,7 +23,7 @@ G = nx.read_edgelist(
                     edgetype = None,
                     encoding = 'utf-8'
                     )
-
+largest_cc = G.subgraph(max(nx.connected_components(G), key=len))
 
 ############## Task 3
 # Perform spectral clustering to partition graph G into k clusters
@@ -45,18 +45,20 @@ def spectral_clustering(G, k):
     ##################
     # Get the adjacency matrix A and the degree matrix D
     A = nx.adjacency_matrix(G).todense()
-    degrees = dict(G.degree())
-    degree_matrix = np.diag([degrees[node] for node in G.nodes()])
+    inverse_degree_sequence = [1 / G.degree(node) for node in G.nodes()]
+    D = diags(inverse_degree_sequence)
 
     # Compute the Laplacian matrix L
-    L = np.eye(G.number_of_nodes()) - np.linalg.inv(degree_matrix) @ A
+    L = eye(G.number_of_nodes()) - D @ A
 
     # Compute the first k eigenvectors of L
     eigvals, eigvecs = eigs(L, k = k, which = 'SR')
 
     # Apply KMeans to the rows of the matrix of eigenvectors
-    kmeans = KMeans(n_clusters = k, random_state = 0).fit(eigvecs.real)
-    clustering = dict(zip(G.nodes(), kmeans.labels_))
+    U = np.real(np.array(eigvecs))
+    kmeans = KMeans(n_clusters=k, n_init='auto').fit(U)
+    clustering = kmeans.predict(U)
+    clustering = {n: c for n, c in zip(G.nodes(), clustering)}
     ##################
     return clustering
 
@@ -64,27 +66,9 @@ def spectral_clustering(G, k):
 ############## Task 4
 
 ##################
-#k = 50  # very long !
-k = 10
-clustering_50 = spectral_clustering(G, k)
-sample_nodes = np.random.choice(list(G.nodes()), size = 500, replace=False)
-H = G.subgraph(sample_nodes)
-node_color = [clustering_50[node] for node in sample_nodes]
-
-# Visualisation du sous-graphe avec les couleurs des clusters
-plt.figure(figsize=(10, 10))
-nx.draw(H, with_labels = True, 
-        node_color = node_color, 
-        cmap = plt.cm.rainbow, 
-        node_size = 50, 
-        font_size=10)
-unique_colors = list(set(node_color))  # Liste des couleurs uniques
-patches = [mpatches.Patch(color=plt.cm.rainbow(color / max(unique_colors)), 
-                          label=f'Cluster {int(color)}') for color in unique_colors]
-plt.legend(handles=patches, title="Clusters")
-
-plt.title("Sample of Spectral Clustering")
-plt.show()
+k = 50
+clustering_50 = spectral_clustering(largest_cc, k)
+print("Number of clusters for k = 50: ", len(set(clustering_50.values())))
 ##################
 
 
@@ -124,7 +108,15 @@ def modularity(G, clustering):
 ############## Task 6
 
 ##################
-# your code here #
+print("Modularity value for k = 50:", modularity(largest_cc, clustering_50))
+random_clustering = { node : randint(0,49) for node in largest_cc.nodes() }
+random_m = modularity(largest_cc, random_clustering)
+print("The modularity of the random clustering is ", random_m)
+
+""" 
+Modularity value for k = 50: 0.1966931835316136
+The modularity of the random clustering is  -0.00033244187612085577
+"""
 ##################
 
 

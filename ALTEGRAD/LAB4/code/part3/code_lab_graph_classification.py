@@ -11,13 +11,19 @@ from torch_geometric.datasets import TUDataset
 from torch_geometric.utils import to_networkx
 
 ############## Task 7
-
-
+path = 'ALTEGRAD/LAB4/code/datasets/MUTAG'
 #load Mutag dataset
 def load_dataset():
 
     ##################
-    # your code here #
+    # Load the dataset
+    dataset = TUDataset(root = '/tmp/ENZYMES', name='ENZYMES')  # Example with ENZYMES dataset
+
+    # Convert graphs in the dataset to NetworkX format
+    Gs = [to_networkx(data, to_undirected=True) for data in dataset]
+
+    # Extract labels for each graph in the dataset
+    y = [data.y.item() for data in dataset]
     ##################
 
     y = [data.y.item() for data in dataset]
@@ -25,8 +31,6 @@ def load_dataset():
 
 
 Gs,y = load_dataset()
-
-#Gs, y = create_dataset()
 G_train, G_test, y_train, y_test = train_test_split(Gs, y, test_size=0.2, random_state=42)
 
 # Compute the shortest path kernel
