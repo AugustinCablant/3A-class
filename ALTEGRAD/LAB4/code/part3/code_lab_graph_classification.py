@@ -121,6 +121,49 @@ def graphlet_kernel(Gs_train, Gs_test, n_samples=200):
     ##################
     # your code here #
     ##################
+    def generate_feature_map(graphs, graphlets, n_samples):
+        """
+        Generate feature maps for a list of graphs by sampling subgraphs 
+        and matching them to predefined graphlets.
+
+        Args:
+            graphs (list): List of NetworkX graphs.
+            graphlets (list): List of predefined NetworkX graphlets for comparison.
+            n_samples (int): Number of subgraph samples per graph.
+
+        Returns:
+            np.ndarray: Feature matrix of shape (len(graphs), len(graphlets)).
+        """
+        # Initialize the feature matrix
+        phi = np.zeros((len(graphs), len(graphlets)))
+
+        # Helper function to match a subgraph to one of the graphlets
+        def match_graphlet(subgraph):
+            for idx, graphlet in enumerate(graphlets):
+                if nx.is_isomorphic(subgraph, graphlet):
+                    return idx
+            return None
+
+        # Iterate through the graphs and generate features
+        for i, G in enumerate(graphs):
+            if len(G.nodes()) < 3:  # Skip graphs with fewer than 3 nodes
+                print(f"Skipping graph {i} due to insufficient nodes.")
+                continue
+
+            for _ in range(n_samples):
+                # Randomly sample 3 nodes from the graph
+                nodes = np.random.choice(G.nodes(), 3, replace=False)
+                subgraph = G.subgraph(nodes)
+
+                # Match the subgraph to a graphlet and increment the count
+                graphlet_idx = match_graphlet(subgraph)
+                if graphlet_idx is not None:
+                    phi[i, graphlet_idx] += 1
+
+        return phi
+
+    phi_train = generate_feature_map(Gs_train, graphlets, n_samples)
+    phi_test = generate_feature_map(Gs_test, graphlets, n_samples)
 
     K_train = np.dot(phi_train, phi_train.T)
     K_test = np.dot(phi_test, phi_train.T)
@@ -137,7 +180,28 @@ K_train_sp, K_test_sp = shortest_path_kernel(G_train, G_test)
 ##################
 # your code here #
 ##################
+K_train_gl, K_test_gl = graphlet_kernel(G_train, G_test)
+K_train_sp, K_test_sp = shortest_path_kernel(G_train, G_test)
 
+# GL
+print("Graphlet Kernel Matrix for Training Data (K_train_gl):")
+print("")
+print(K_train_gl)
+print("")
+print("Graphlet Kernel Matrix for Test Data (K_test_gl):")
+print("")
+print(K_test_gl)
+
+print("")
+
+# SP
+print("Shortest Path Kernel Matrix for Training Data (K_train_sp):")
+print("")
+print(K_train_sp)
+print("")
+print("Shortest Path Kernel Matrix for Test Data (K_test_sp):")
+print("")
+print(K_test_sp)
 
 
 ############## Task 10
@@ -145,3 +209,28 @@ K_train_sp, K_test_sp = shortest_path_kernel(G_train, G_test)
 ##################
 # your code here #
 ##################
+G_train, G_test, y_train, y_test = train_test_split(Gs, y, test_size=0.2, random_state=42)
+
+K_train_sp, K_test_sp = shortest_path_kernel(G_train, G_test)
+K_train_gl, K_test_gl = graphlet_kernel(G_train, G_test)
+
+# Check the dimensions
+print("K_train_sp shape:", K_train_sp.shape)
+print("y_train length:", len(y_train))
+
+# SVM training
+if K_train_sp.shape[0] == len(y_train):
+
+    clf_sp = SVC(kernel='precomputed')
+    clf_sp.fit(K_train_sp, y_train)
+    y_pred_sp = clf_sp.predict(K_test_sp)
+    accuracy_sp = accuracy_score(y_test, y_pred_sp)
+    print("Accuracy with Shortest Path Kernel:", accuracy_sp)
+
+    clf_gl = SVC(kernel='precomputed')
+    clf_gl.fit(K_train_gl, y_train)
+    y_pred_gl = clf_gl.predict(K_test_gl)
+    accuracy_gl = accuracy_score(y_test, y_pred_gl)
+    print("Accuracy with Graphlet Kernel:", accuracy_gl)
+else:
+    print("Kernel matrix dimensions do not match with training labels.")
