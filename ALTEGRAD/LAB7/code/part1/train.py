@@ -7,6 +7,7 @@ import numpy as np
 import torch
 import torch.optim as optim
 import torch.nn as nn
+from tqdm import tqdm 
 
 from utils import create_train_dataset
 from models import DeepSets, LSTM
@@ -33,7 +34,7 @@ optimizer = optim.Adam(deepsets.parameters(), lr=learning_rate)
 loss_function = nn.L1Loss()
 
 # Trains the DeepSets model
-for epoch in range(epochs):
+for epoch in tqdm(list(range(epochs)), desc = "Trains the DeepSets model"):
     t = time.time()
     deepsets.train()
      
@@ -45,7 +46,10 @@ for epoch in range(epochs):
         ############## Task 5
     
         ##################
-        # your code here #
+        x_batch = torch.LongTensor(np.array(X_train))
+        x_batch = x_batch[idx[i: min(i + batch_size, n_train)],:]
+        y_batch = torch.LongTensor(np.array(y_train))
+        y_batch = y_batch[idx[i: i+batch_size]]
         ##################
         
         optimizer.zero_grad()
@@ -75,7 +79,7 @@ optimizer = optim.Adam(lstm.parameters(), lr=learning_rate)
 loss_function = nn.L1Loss()
 
 # Trains the LSTM model
-for epoch in range(epochs):
+for epoch in tqdm(list(range(epochs)), desc = "Trains the LSTM model"):
     t = time.time()
     lstm.train()
      
@@ -87,7 +91,10 @@ for epoch in range(epochs):
         ############## Task 5
         
         ##################
-        # your code here #
+        x_batch = torch.LongTensor(np.array(X_train))
+        x_batch = x_batch[idx[i: min(i+batch_size, n_train)],:]
+        y_batch = torch.LongTensor(np.array(y_train))
+        y_batch = y_batch[idx[i: i+batch_size]]
         ##################
         
         optimizer.zero_grad()

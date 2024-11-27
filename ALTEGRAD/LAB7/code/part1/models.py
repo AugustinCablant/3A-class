@@ -40,7 +40,9 @@ class LSTM(nn.Module):
         ############## Task 4
     
         ##################
-        # your code here #
+        x = self.embedding(x)
+        _, (x, _) = self.lstm(x)
+        x = self.fc(x)
         ##################
         
         return x.squeeze()

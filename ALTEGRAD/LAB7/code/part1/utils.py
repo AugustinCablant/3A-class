@@ -6,7 +6,7 @@ import numpy as np
 
 
 def create_train_dataset():
-    n_train = 10 ** 4
+    n_train = 10 ** 5
     max_train_card = 10
 
     ############## Task 1
@@ -26,7 +26,7 @@ def create_train_dataset():
 
 
 def create_test_dataset():
-    n_test = 20 ** 4 
+    n_test = 20 ** 5 
     ############## Task 2
     
     ##################
