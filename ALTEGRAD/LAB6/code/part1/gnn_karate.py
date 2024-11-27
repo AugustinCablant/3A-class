@@ -47,9 +47,9 @@ y = np.array(y)
 n_class = 2
 
 ############## Task 3
-adj = nx.adjacency_matrix(G) # your code here #
-features = np.random.randn(n, 4) # your code here #
-# features = np.ones((n, 1))
+adj = nx.adjacency_matrix(G) 
+features = np.random.randn(n, 4) 
+
 
 # Yields indices to split data into training and test sets
 idx = np.random.RandomState(seed=42).permutation(n)
@@ -95,9 +95,10 @@ print("Test set results:",
       "accuracy= {:.4f}".format(acc_test))
 
 
-""" 
+
 ############## Task 4
-alpha = # your code here #
+_, alpha = model(features, adj)
+alpha = alpha.detach().cpu().numpy()
 
 # Dictionary that maps indices of nodes to nodes
 idx_to_node = dict()
@@ -122,4 +123,3 @@ pos = nx.spring_layout(G_directed)
 arc_rad = 0.25
 nx.draw(G_directed, width=weights, connectionstyle=f'arc3, rad = {arc_rad}')
 plt.show()
-"""
