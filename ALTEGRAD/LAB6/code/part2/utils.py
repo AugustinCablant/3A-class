@@ -11,11 +11,19 @@ def create_dataset():
     Gs = list()
     y = list()
 
-    ############## Task 5
+    ############## Task 1
     
     ##################
     # your code here #
     ##################
+
+    ns = np.random.randint(10, 21, 100)
+    for n in ns[:50]:
+        Gs.append(nx.fast_gnp_random_graph(n, 0.2))
+        y.append(0)
+    for n in ns[50:]:
+        Gs.append(nx.fast_gnp_random_graph(n, 0.4))
+        y.append(1)   
 
     return Gs, y
 
