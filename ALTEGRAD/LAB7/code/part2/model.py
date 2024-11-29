@@ -37,7 +37,12 @@ class Decoder(nn.Module):
         ############## Task 10
     
         ##################
-        # your code here #
+        for i in range(self.n_layers):
+            x = self.fc[i](x)
+        
+        x = self.fc_proj(x)
+        x = x.reshape(-1, self.n_nodes, self.n_nodes)
+        adj = 0.5 * (x + torch.transpose(x, 1, 2))     # Symmetrize
         ##################
         
         return adj
@@ -64,13 +69,17 @@ class Encoder(nn.Module):
         self.ln = nn.LayerNorm(hidden_dim)
         self.dropout = nn.Dropout(dropout)
         self.relu = nn.ReLU()
+        self.n_layers = n_layers
 
     def forward(self, adj, x, idx):
         ############## Task 8
     
         ##################
-        # your code here #
+        for i in range(self.n_layers):
+            x = torch.mm(adj,x)
+            x = self.mlps[i](x)
         ##################
+
 
         # Readout
         idx = idx.unsqueeze(1).repeat(1, x.size(1))
@@ -111,8 +120,8 @@ class VariationalAutoEncoder(nn.Module):
         
         ############## Task 9
     
-        mu = # your code here
-        logvar = # your code here
+        mu = self.fc_mu(x_g)    # your code here
+        logvar = self.fc_logvar(x_g)  # your code here
         
         x_g = self.reparameterize(mu, logvar)
         adj = self.decoder(x_g)

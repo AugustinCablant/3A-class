@@ -15,7 +15,7 @@ import torch.nn.functional as F
 
 from model import VariationalAutoEncoder
 from utils import normalize_adjacency, sparse_mx_to_torch_sparse, find_communities_and_plot
-
+from pathlib import Path
 np.random.seed(13)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -32,7 +32,9 @@ max_nodes = 40
 input_feats = 2
 
 # Load dataset
-adj_dict = loadmat("../data/sbm.mat")
+pth = Path(__file__).parent.parent/"data"/"sbm.mat"
+adj_dict = loadmat(str(pth))
+#adj_dict = loadmat("/Users/augustincablant/Documents/GitHub/3A-class/ALTEGRAD/LAB7/code/data/sbm.mat")
 adj = [adj_dict['G'+str(i)] for i in range(1000)]
 n_graphs = len(adj)
 
@@ -141,8 +143,8 @@ autoencoder.eval()
 
 
 ############## Task 11
-z = # your code here #
-adj = # your code here #
+z = torch.randn(size = (5, latent_dim)).to(device)
+adj = autoencoder.decode(z)
 
 
 # Create and visualize graphs
@@ -156,4 +158,8 @@ for i in range(adj.size(0)):
         if G.degree(node) == 0:
             to_remove.append(node)
     G.remove_nodes_from(to_remove)
-    find_communities_and_plot(G)
+    find_communities_and_plot(
+                            G, 
+                            save_path = Path(__file__).parent.parent.parent/"figures",
+                            fig_name = f"graph_{i:02d}"
+                            )
