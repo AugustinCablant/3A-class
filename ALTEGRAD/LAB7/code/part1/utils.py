@@ -26,21 +26,23 @@ def create_train_dataset():
 
 
 def create_test_dataset():
-    n_test = 20 ** 5 
     ############## Task 2
     
     ##################
+    n_test = 10000
+    step_test_card = 5
+    max_test_card = 101
+    min_test_card = 5
+    cards = range(min_test_card, max_test_card, step_test_card)
+    n_sample_per_card = n_test // len(cards)
+
     X_test = list()
     y_test = list()
-    
-    cards = range(5, 101, 5)
-    n_sample_per_card = n_test // len(cards)
-    for card in cards:
-        for _ in range(n_sample_per_card):
-            sample = np.random.randint(1, 11, card)
-            sample = np.pad(sample, pad_width = (100 - sample.shape[0], 0), constant_values = 0 )
-            X_test.append(sample)
-            y_test.append(np.sum(sample))
-    ##################
 
+    for card in cards:
+        X = np.random.randint(1,11, size = (n_sample_per_card, card))
+        y = np.sum(X, axis=1)
+        X_test.append(X)
+        y_test.append(y)
+                      
     return X_test, y_test

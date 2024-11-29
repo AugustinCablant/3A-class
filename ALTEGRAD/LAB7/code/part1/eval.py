@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, mean_absolute_error
 import torch
-
+from tqdm import tqdm
 from utils import create_test_dataset
 from models import DeepSets, LSTM
 
@@ -41,7 +41,7 @@ lstm.eval()
 # Dict to store the results
 results = {'deepsets': {'acc':[], 'mae':[]}, 'lstm': {'acc':[], 'mae':[]}}
 
-for i in range(len(cards)):
+for i in tqdm(range(len(cards))):
     y_pred_deepsets = list()
     y_pred_lstm = list()
     for j in range(0, n_samples_per_card, batch_size):
@@ -49,22 +49,31 @@ for i in range(len(cards)):
         ############## Task 6
     
         ##################
-        # your code here #
+        x_batch = X_test[i][j:min(j+batch_size, n_samples_per_card), :]
+        x_batch = torch.LongTensor(x_batch)
+        y_batch = torch.LongTensor(y_test)
+        y_batch = y_batch[i][j:min(j+batch_size, n_samples_per_card)]
+
+        output_deepsets = deepsets(x_batch)
+        y_pred_deepsets.append(output_deepsets)
+
+        output_lstm = lstm(x_batch)
+        y_pred_lstm.append(output_lstm)
         ##################
         
     y_pred_deepsets = torch.cat(y_pred_deepsets)
     y_pred_deepsets = y_pred_deepsets.detach().cpu().numpy()
     
-    acc_deepsets = #your code here
-    mae_deepsets = #your code here
+    acc_deepsets = accuracy_score(y_test[i], np.round(y_pred_deepsets))   
+    mae_deepsets = mean_absolute_error(y_test[i], y_pred_deepsets)  
     results['deepsets']['acc'].append(acc_deepsets)
     results['deepsets']['mae'].append(mae_deepsets)
     
     y_pred_lstm = torch.cat(y_pred_lstm)
     y_pred_lstm = y_pred_lstm.detach().cpu().numpy()
     
-    acc_lstm = #your code here
-    mae_lstm = #your code here
+    acc_lstm = accuracy_score(y_test[i], np.round(y_pred_lstm)) 
+    mae_lstm = mean_absolute_error(y_test[i], y_pred_lstm)
     results['lstm']['acc'].append(acc_lstm)
     results['lstm']['mae'].append(mae_lstm)
 
@@ -72,5 +81,11 @@ for i in range(len(cards)):
 ############## Task 7
     
 ##################
-# your code here #
+plt.figure(figsize=(10, 6))
+plt.plot(cards, results['deepsets']['acc'], label = 'DeepSets accuracy', color = 'orange')
+plt.plot(cards, results['lstm']['acc'], label = 'LSTM accuracy', color = 'cyan')
+plt.xlabel('Cardinality')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
 ##################
