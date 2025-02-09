@@ -18,7 +18,7 @@ n_embd = 32
 torch.manual_seed(2023)
 
 # Load the Victor Hugo dataset
-with open('data/hugo_contemplations.txt', 'r', encoding='utf-8') as f:
+with open('NLP/TD LLM/data/hugo_contemplations.txt', 'r', encoding='utf-8') as f:
     text = f.read()
 
 # here are all the unique characters that occur in this text
@@ -67,7 +67,10 @@ class Head(nn.Module):
         super().__init__()
         # YOUR CODE
         # add you key, query and value definitions
-
+        self.head_size = head_size
+        self.key =  torch.nn.Linear(n_embd, head_size, bias=False)
+        self.query =  torch.nn.Linear(n_embd, head_size, bias=False)
+        self.value =  torch.nn.Linear(n_embd, head_size, bias=False)
         ###
         self.register_buffer('tril', torch.tril(torch.ones(block_size, block_size)))
 
@@ -76,9 +79,15 @@ class Head(nn.Module):
     def forward(self, x):
         B,T,C = x.shape
         ## YOUR CODE HERE
-
+        k =  self.key(x)  # (B, T, head_size)
+        q =  self.query(x) # (B, T, head_size)
+        v =  self.value(x) # (B, T, head_size)
+        weights =   (q @ k.transpose(-2, -1)) / (self.head_size ** (0.5))
+        tril = torch.tril(torch.ones(T,T))
+        weights = weights.masked_fill(tril== 0, float('-inf'))
+        weights = nn.functional.softmax(weights, dim=-1)
         ###
-        out = weight @ v # (B, T, T) @ (B, T, C) -> (B, T, C)
+        out = weights @ v # (B, T, T) @ (B, T, C) -> (B, T, C)
         return out
 
 
